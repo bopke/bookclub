@@ -49,11 +49,20 @@ describe('BookController (e2e)', () => {
 
   it('/books (GET) returns array of books', async () => {
     const response = await request(app.getHttpServer())
-      .get('/books')
+      .get('/books?page=1&limit=10')
       .expect(HttpStatus.OK);
 
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThanOrEqual(1);
+    expect(response.body).toEqual({
+      data: [
+        expect.objectContaining({
+          id: createdBookId,
+          title: mockBookDto.title,
+        }),
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+    });
   });
 
   it('/books/:id (GET) returns single book', async () => {

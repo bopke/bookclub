@@ -17,8 +17,17 @@ export class BooksService {
     return this.bookRepository.save(book);
   }
 
-  async findAll(): Promise<Book[]> {
-    return this.bookRepository.find();
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Book[]; total: number; page: number; limit: number }> {
+    const [books, total] = await this.bookRepository.findAndCount({
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data: books, total, page, limit };
   }
 
   async findOne(id: string): Promise<Book> {

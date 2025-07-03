@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   Put,
+  Query,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/CreateBook.dto';
@@ -18,21 +19,24 @@ import { UpdateBookDto } from './dto/UpdateBook.dto';
 
 @Controller('books')
 export class BooksController {
-  constructor(private readonly bookService: BooksService) {}
+  constructor(private readonly booksService: BooksService) {}
 
   @Post()
   create(@Body() createBookDto: CreateBookDto): Promise<Book> {
-    return this.bookService.create(createBookDto);
+    return this.booksService.create(createBookDto);
   }
 
   @Get()
-  findAll(): Promise<Book[]> {
-    return this.bookService.findAll();
+  findAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+  ): Promise<{ data: Book[]; total: number; page: number; limit: number }> {
+    return this.booksService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Book> {
-    return this.bookService.findOne(id);
+    return this.booksService.findOne(id);
   }
 
   @Patch(':id')
@@ -40,7 +44,7 @@ export class BooksController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<Book> {
-    return this.bookService.update(id, updateBookDto);
+    return this.booksService.update(id, updateBookDto);
   }
 
   @Put(':id')
@@ -48,12 +52,12 @@ export class BooksController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createBookDto: CreateBookDto,
   ): Promise<Book> {
-    return this.bookService.update(id, createBookDto);
+    return this.booksService.update(id, createBookDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
-    return this.bookService.remove(id);
+    return this.booksService.remove(id);
   }
 }
