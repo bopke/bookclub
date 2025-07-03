@@ -1,15 +1,16 @@
 //Causes trouble in expect(service.create)[...]
 /* eslint-disable @typescript-eslint/unbound-method */
-import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from './books.service';
 import { DeleteResult, Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { NotFoundException } from '@nestjs/common';
 import { mock, MockProxy } from 'jest-mock-extended';
+import { Comment } from '../comments/entities/comment.entity';
 
 describe('BooksService', () => {
   let service: BooksService;
-  let repo: MockProxy<Repository<Book>>;
+  let bookRepo: MockProxy<Repository<Book>>;
+  let commentRepo: MockProxy<Repository<Comment>>;
 
   const exampleBook: Book = {
     id: '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
@@ -24,8 +25,9 @@ describe('BooksService', () => {
   };
 
   beforeEach(() => {
-    repo = mock<Repository<Book>>();
-    service = new BooksService(repo);
+    bookRepo = mock<Repository<Book>>();
+    commentRepo = mock<Repository<Comment>>();
+    service = new BooksService(bookRepo, commentRepo);
   });
 
   describe('create', () => {
@@ -37,24 +39,24 @@ describe('BooksService', () => {
         numberOfPages: exampleBook.numberOfPages,
         rating: exampleBook.rating,
       };
-      repo.create.mockReturnValue(exampleBook);
-      repo.save.mockResolvedValue(exampleBook);
+      bookRepo.create.mockReturnValue(exampleBook);
+      bookRepo.save.mockResolvedValue(exampleBook);
 
       const result = await service.create(dto);
 
-      expect(repo.create).toHaveBeenCalledWith(dto);
-      expect(repo.save).toHaveBeenCalledWith(exampleBook);
+      expect(bookRepo.create).toHaveBeenCalledWith(dto);
+      expect(bookRepo.save).toHaveBeenCalledWith(exampleBook);
       expect(result).toEqual(exampleBook);
     });
   });
 
   describe('findAll', () => {
     it('should return paginated books', async () => {
-      repo.findAndCount.mockResolvedValue([[exampleBook], 1]);
+      bookRepo.findAndCount.mockResolvedValue([[exampleBook], 1]);
 
       const result = await service.findAll(1, 10);
 
-      expect(repo.findAndCount).toHaveBeenCalledWith({
+      expect(bookRepo.findAndCount).toHaveBeenCalledWith({
         order: { createdAt: 'DESC' },
         skip: 0,
         take: 10,
@@ -70,34 +72,34 @@ describe('BooksService', () => {
 
   describe('findOne', () => {
     it('should return a book by ID', async () => {
-      repo.findOneBy.mockResolvedValue(exampleBook);
+      bookRepo.findOneBy.mockResolvedValue(exampleBook);
 
       const result = await service.findOne(exampleBook.id);
 
-      expect(repo.findOneBy).toHaveBeenCalledWith({ id: exampleBook.id });
+      expect(bookRepo.findOneBy).toHaveBeenCalledWith({ id: exampleBook.id });
       expect(result).toEqual(exampleBook);
     });
 
     it('should throw NotFoundException if book not found', async () => {
-      repo.findOneBy.mockResolvedValue(null);
+      bookRepo.findOneBy.mockResolvedValue(null);
 
       await expect(service.findOne('nonexistent-id')).rejects.toThrow(
         NotFoundException,
       );
-      expect(repo.findOneBy).toHaveBeenCalledWith({ id: 'nonexistent-id' });
+      expect(bookRepo.findOneBy).toHaveBeenCalledWith({ id: 'nonexistent-id' });
     });
   });
 
   describe('update', () => {
     it('should update an existing book', async () => {
       const updatedData = { title: 'Updated Title' };
-      repo.findOneBy.mockResolvedValue(exampleBook);
-      repo.save.mockResolvedValue({ ...exampleBook, ...updatedData });
+      bookRepo.findOneBy.mockResolvedValue(exampleBook);
+      bookRepo.save.mockResolvedValue({ ...exampleBook, ...updatedData });
 
       const result = await service.update(exampleBook.id, updatedData);
 
-      expect(repo.findOneBy).toHaveBeenCalledWith({ id: exampleBook.id });
-      expect(repo.save).toHaveBeenCalledWith({
+      expect(bookRepo.findOneBy).toHaveBeenCalledWith({ id: exampleBook.id });
+      expect(bookRepo.save).toHaveBeenCalledWith({
         ...exampleBook,
         ...updatedData,
       });
@@ -105,31 +107,31 @@ describe('BooksService', () => {
     });
 
     it('should throw NotFoundException if book does not exist', async () => {
-      repo.findOneBy.mockResolvedValue(null);
+      bookRepo.findOneBy.mockResolvedValue(null);
 
       await expect(service.update('nonexistent-id', {})).rejects.toThrow(
         NotFoundException,
       );
-      expect(repo.findOneBy).toHaveBeenCalledWith({ id: 'nonexistent-id' });
+      expect(bookRepo.findOneBy).toHaveBeenCalledWith({ id: 'nonexistent-id' });
     });
   });
 
   describe('remove', () => {
     it('should remove an existing book', async () => {
-      repo.delete.mockResolvedValue({ affected: 1 } as DeleteResult);
+      bookRepo.delete.mockResolvedValue({ affected: 1 } as DeleteResult);
 
       await service.remove(exampleBook.id);
 
-      expect(repo.delete).toHaveBeenCalledWith(exampleBook.id);
+      expect(bookRepo.delete).toHaveBeenCalledWith(exampleBook.id);
     });
 
     it('should throw NotFoundException if book does not exist', async () => {
-      repo.delete.mockResolvedValue({ affected: 0 } as DeleteResult);
+      bookRepo.delete.mockResolvedValue({ affected: 0 } as DeleteResult);
 
       await expect(service.remove('nonexistent-id')).rejects.toThrow(
         NotFoundException,
       );
-      expect(repo.delete).toHaveBeenCalledWith('nonexistent-id');
+      expect(bookRepo.delete).toHaveBeenCalledWith('nonexistent-id');
     });
   });
 });
