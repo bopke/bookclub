@@ -6,23 +6,12 @@ import { Book } from './entities/book.entity';
 import { NotFoundException } from '@nestjs/common';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { Comment } from '../comments/entities/comment.entity';
+import { exampleBook, nonexistentBookId } from '../../test/common';
 
 describe('BooksService', () => {
   let service: BooksService;
   let bookRepo: MockProxy<Repository<Book>>;
   let commentRepo: MockProxy<Repository<Comment>>;
-
-  const exampleBook: Book = {
-    id: '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-    title: 'Best book ever, look it up!',
-    author: 'Nick Morgan',
-    isbn: '9788301183165',
-    numberOfPages: 320,
-    rating: 5,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    comments: [],
-  };
 
   beforeEach(() => {
     bookRepo = mock<Repository<Book>>();
@@ -83,10 +72,12 @@ describe('BooksService', () => {
     it('should throw NotFoundException if book not found', async () => {
       bookRepo.findOneBy.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow(
+      await expect(service.findOne(nonexistentBookId)).rejects.toThrow(
         NotFoundException,
       );
-      expect(bookRepo.findOneBy).toHaveBeenCalledWith({ id: 'nonexistent-id' });
+      expect(bookRepo.findOneBy).toHaveBeenCalledWith({
+        id: nonexistentBookId,
+      });
     });
   });
 
@@ -109,10 +100,12 @@ describe('BooksService', () => {
     it('should throw NotFoundException if book does not exist', async () => {
       bookRepo.findOneBy.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent-id', {})).rejects.toThrow(
+      await expect(service.update(nonexistentBookId, {})).rejects.toThrow(
         NotFoundException,
       );
-      expect(bookRepo.findOneBy).toHaveBeenCalledWith({ id: 'nonexistent-id' });
+      expect(bookRepo.findOneBy).toHaveBeenCalledWith({
+        id: nonexistentBookId,
+      });
     });
   });
 
@@ -128,10 +121,10 @@ describe('BooksService', () => {
     it('should throw NotFoundException if book does not exist', async () => {
       bookRepo.delete.mockResolvedValue({ affected: 0 } as DeleteResult);
 
-      await expect(service.remove('nonexistent-id')).rejects.toThrow(
+      await expect(service.remove(nonexistentBookId)).rejects.toThrow(
         NotFoundException,
       );
-      expect(bookRepo.delete).toHaveBeenCalledWith('nonexistent-id');
+      expect(bookRepo.delete).toHaveBeenCalledWith(nonexistentBookId);
     });
   });
 });

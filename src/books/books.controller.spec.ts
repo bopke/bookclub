@@ -1,48 +1,20 @@
 //Causes trouble in expect(service.create)[...]
 /* eslint-disable @typescript-eslint/unbound-method */
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import { CreateBookDto } from './dto/CreateBook.dto';
 import { UpdateBookDto } from './dto/UpdateBook.dto';
-import { Book } from './entities/book.entity';
-
-const mockBook: Book = {
-  id: '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-  title: 'Best book ever, look it up!',
-  author: 'Nick Morgan',
-  isbn: '9788301183165',
-  numberOfPages: 320,
-  rating: 5,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  comments: [],
-};
+import { exampleBook, nonexistentBookId } from '../../test/common';
+import { mock, MockProxy } from 'jest-mock-extended';
 
 describe('BookController', () => {
   let controller: BooksController;
-  let service: jest.Mocked<BooksService>;
+  let service: MockProxy<BooksService>;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [BooksController],
-      providers: [
-        {
-          provide: BooksService,
-          useValue: {
-            findAll: jest.fn(),
-            remove: jest.fn(),
-            findOne: jest.fn(),
-            update: jest.fn(),
-            create: jest.fn(),
-          },
-        },
-      ],
-    }).compile();
-
-    controller = module.get<BooksController>(BooksController);
-    service = module.get(BooksService);
+  beforeEach(() => {
+    service = mock<BooksService>();
+    controller = new BooksController(service);
   });
 
   afterEach(() => {
@@ -57,28 +29,16 @@ describe('BookController', () => {
       numberOfPages: 320,
       rating: 5,
     };
-    service.create.mockResolvedValue(mockBook);
+    service.create.mockResolvedValue(exampleBook);
 
     const result = await controller.create(dto);
     expect(service.create).toHaveBeenCalledWith(dto);
-    expect(result).toEqual(mockBook);
+    expect(result).toEqual(exampleBook);
   });
 
   it('should return paginated books', async () => {
     const mockResult = {
-      data: [
-        {
-          id: '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-          title: 'Best book ever, look it up!',
-          author: 'Nick Morgan',
-          isbn: '9788301183165',
-          numberOfPages: 320,
-          rating: 5,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          comments: [],
-        } as Book,
-      ],
+      data: [exampleBook],
       total: 1,
       page: 1,
       limit: 10,
@@ -93,30 +53,20 @@ describe('BookController', () => {
   });
 
   it('should return one book', async () => {
-    service.findOne.mockResolvedValue(mockBook);
+    service.findOne.mockResolvedValue(exampleBook);
 
-    const result = await controller.findOne(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-    );
-    expect(service.findOne).toHaveBeenCalledWith(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-    );
-    expect(result).toEqual(mockBook);
+    const result = await controller.findOne(exampleBook.id);
+    expect(service.findOne).toHaveBeenCalledWith(exampleBook.id);
+    expect(result).toEqual(exampleBook);
   });
 
   it('should update a book partially', async () => {
     const dto: UpdateBookDto = { title: 'Updated Title' };
-    const updatedBook = { ...mockBook, ...dto };
+    const updatedBook = { ...exampleBook, ...dto };
     service.update.mockResolvedValue(updatedBook);
 
-    const result = await controller.update(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-      dto,
-    );
-    expect(service.update).toHaveBeenCalledWith(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-      dto,
-    );
+    const result = await controller.update(exampleBook.id, dto);
+    expect(service.update).toHaveBeenCalledWith(exampleBook.id, dto);
     expect(result.title).toBe('Updated Title');
   });
 
@@ -128,34 +78,24 @@ describe('BookController', () => {
       numberOfPages: 320,
       rating: 5,
     };
-    service.update.mockResolvedValue({ ...mockBook, ...dto });
+    service.update.mockResolvedValue({ ...exampleBook, ...dto });
 
-    const result = await controller.replace(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-      dto,
-    );
-    expect(service.update).toHaveBeenCalledWith(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-      dto,
-    );
+    const result = await controller.replace(exampleBook.id, dto);
+    expect(service.update).toHaveBeenCalledWith(exampleBook.id, dto);
     expect(result.title).toBe('Replaced Book');
   });
 
   it('should remove a book', async () => {
     service.remove.mockResolvedValue(undefined);
 
-    await expect(
-      controller.remove('224e0b9d-1f55-4599-ab5b-2e997a8a4196'),
-    ).resolves.toBeUndefined();
-    expect(service.remove).toHaveBeenCalledWith(
-      '224e0b9d-1f55-4599-ab5b-2e997a8a4196',
-    );
+    await expect(controller.remove(exampleBook.id)).resolves.toBeUndefined();
+    expect(service.remove).toHaveBeenCalledWith(exampleBook.id);
   });
 
   it('should throw NotFoundException if book not found', async () => {
     service.findOne.mockRejectedValue(new NotFoundException());
 
-    await expect(controller.findOne('invalid-id')).rejects.toThrow(
+    await expect(controller.findOne(nonexistentBookId)).rejects.toThrow(
       NotFoundException,
     );
   });
