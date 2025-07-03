@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity()
 @Check(`"rating" >= 1 AND "rating" <= 5`)
@@ -34,4 +36,7 @@ export class Book {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.book)
+  comments: Comment[];
 }
