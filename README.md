@@ -1,98 +1,70 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+Bookclub
+--------
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> Keep your reading history organised 
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Have you ever thought "Well, I'll be... 1984 by George Orwell, huh? That seems like a mighty fine read. Can't quite remember if I read it already, maybe 75 years ago or so. Wish I’d jotted it down back then, would've made things a lot easier!"
 
-## Description
+If your answer is yes, then fear not! With Bookclub, you can keep track of books you've read and your rating for each of them,
+so when the time comes for next visit to the library or bookstore, you will be well-equipped to ask for suggestions and discuss with the clerk on your next pick of well written poetry, or great adventure prose...
+As long as you are fluent in JSON.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Interacting with the app
 
-## Project setup
+### Dockerized path
+
+To avoid any "It doesn't work on my machine" issues, and also not have to ship the program with my own machine (on which it works, I swear!),
+effort was put to encapsulate it into Docker image. Docker compose was also utilized for even more enhanced ease of use.
+
+To take advantage of this fact, just install somewhat up-to-date [Docker](https://www.docker.com/products/docker-desktop/) and run
+```bash
+$ docker compose up
+```
+and watch the app unfold and use it (it will open on port 3000 by default)
+
+If you want to observe how tests are getting greener and greener every day, try
+
+```bash
+$ docker compose run --rm test
+$ docker compose run --rm teste2e
+```
+
+### Old school path
+
+If docker is not for you, that's fine, I've got you covered!
+
+Make sure you have somewhat up-to-date version of nodejs and postgresql server installed. During the development, I spent time with postgresql 17 and nodejs 22.
+
+If you have your node and postgres ready, go ahead and run
 
 ```bash
 $ npm install
 ```
 
-## Compile and run the project
+It will install all required packages. It can take a few minutes, so in that time, execute
 
 ```bash
-# development
+$ cp .env.example .env
+```
+
+and fill it with proper configuration.
+
+When all of the above steps are done, run
+
+```bash
 $ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Run tests
+to run the app, or try
 
 ```bash
-# unit tests
 $ npm run test
-
-# e2e tests
 $ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Deployment
+to run some tests.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Postman collection
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+For your convenience, I've created simple postman collection to help you navigate through endpoints to observe the app in action
+you can find it [here](https://orange-meteor-426133.postman.co/workspace/Bopke's-Workspace~01c1c6ef-47ff-45bd-81e4-d53ffc076088/collection/46453003-8b96d16e-3983-44a0-802a-40c539af80b4?action=share&creator=46453003)
