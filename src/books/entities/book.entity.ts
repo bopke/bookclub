@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -31,6 +32,7 @@ export class Book {
   @Column('int')
   rating: number;
 
+  @Index()
   @CreateDateColumn()
   createdAt: Date;
 

@@ -2,6 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  Index,
   ManyToOne,
   CreateDateColumn,
 } from 'typeorm';
@@ -15,9 +16,11 @@ export class Comment {
   @Column()
   text: string;
 
+  @Index()
   @ManyToOne(() => Book, (book) => book.comments, { onDelete: 'CASCADE' })
   book: Book;
 
+  @Index()
   @CreateDateColumn()
   createdAt: Date;
 }
