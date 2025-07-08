@@ -25,8 +25,8 @@ and watch the app unfold and use it (it will open on port 3000 by default)
 If you want to observe how tests are getting greener and greener every day, try
 
 ```bash
-$ docker compose run --rm test
-$ docker compose run --rm teste2e
+$ docker compose --profile test up
+$ docker compose --profile teste2e up --abort-on-container-exit
 ```
 
 ### Old school path
